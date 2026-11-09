@@ -1,0 +1,943 @@
+<style>
+  :root{
+    --bg0:#0b0609; --bg1:#200a12;
+    --surface:#180a0f; --surface2:#230e16; --line:#3d1a24;
+    --gold:#f5c451; --gold-d:#d9a63a;
+    --red:#e5203b; --red-d:#9d1024; --red-deep:#4e0c16;
+    --txt:#f7eef1; --muted:#ad8893;
+    --blue:#0057b7; --yellow:#ffd700;
+    --green:#35d9a0; --violet:#9b8cff; --pink:#ff4d6d;
+    --f-ui:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --f-plate:"Arial Black",Impact,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0; height:100%}
+  body{
+    background:
+      radial-gradient(900px 520px at 50% -10%, rgba(229,32,59,.28) 0, transparent 60%),
+      radial-gradient(700px 500px at 100% 0%, rgba(157,16,36,.18) 0, transparent 55%),
+      radial-gradient(1200px 800px at 50% 120%, rgba(78,12,22,.35) 0, transparent 60%),
+      var(--bg0);
+    color:var(--txt); font-family:var(--f-ui); display:flex; justify-content:center;
+    align-items:stretch; overflow:hidden;
+  }
+  .app{
+    width:100%; max-width:460px; height:100dvh; display:flex; flex-direction:column;
+    background:
+      radial-gradient(600px 300px at 50% -6%, rgba(229,32,59,.14) 0, transparent 70%),
+      linear-gradient(180deg, #170810 0%, #0c0609 55%, #0b0609 100%);
+    position:relative; overflow:hidden;
+  }
+  .app.shake{animation:shake .6s cubic-bezier(.36,.07,.19,.97)}
+  @keyframes shake{10%,90%{transform:translate(-2px,0)}20%,80%{transform:translate(4px,0)}30%,50%,70%{transform:translate(-7px,0)}40%,60%{transform:translate(7px,0)}}
+  @media (min-width:560px){
+    body{padding:18px}
+    .app{height:min(880px,95vh); border-radius:30px; border:1px solid var(--line);
+      box-shadow:0 34px 90px rgba(0,0,0,.7), 0 0 60px rgba(157,16,36,.25), inset 0 1px 0 rgba(255,255,255,.05)}
+  }
+
+  /* ===== Top bar ===== */
+  .topbar{flex:none; display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:14px 14px 11px; border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(36,12,19,.92), rgba(20,8,12,.55)); backdrop-filter:blur(8px);
+    box-shadow:0 1px 0 rgba(229,32,59,.22), 0 10px 24px rgba(0,0,0,.35)}
+  .logo{font-weight:900; font-size:16px; letter-spacing:.2px; display:flex; align-items:center; gap:6px; min-width:0;
+    text-shadow:0 1px 10px rgba(229,32,59,.35)}
+  .logo .ico{flex:none}
+  .logo .name{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .logo .dot{background:linear-gradient(180deg,var(--gold),var(--gold-d)); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .chips{display:flex; align-items:center; gap:7px; flex:none}
+  @media (max-width:400px){
+    .logo .n1{display:none}
+    .logo{font-size:15px}
+    .chips{gap:6px}
+    .chip{padding:6px 8px}
+    .iconbtn{padding:6px 7px}
+  }
+  .chip{display:flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--line);
+    border-radius:12px; padding:6px 10px; line-height:1}
+  .chip .v{font-weight:800; font-variant-numeric:tabular-nums}
+  .chip.bal .v{color:var(--gold)}
+  .chip.free{color:var(--green); border-color:rgba(53,217,160,.4); background:rgba(53,217,160,.1)}
+  .iconbtn{background:var(--surface); border:1px solid var(--line); color:var(--txt); border-radius:11px;
+    padding:6px 8px; font-size:15px; cursor:pointer; line-height:1}
+  .iconbtn:active{transform:translateY(1px)}
+
+  /* ===== Screens ===== */
+  .screens{flex:1; overflow-y:auto; overflow-x:hidden; padding:14px 14px 10px; display:flex; flex-direction:column}
+  .screen{display:flex; flex-direction:column; gap:13px; animation:fade .25s ease}
+  .screen[hidden]{display:none}
+  @keyframes fade{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+  .scr-head{display:flex; align-items:baseline; justify-content:space-between; gap:8px}
+  .scr-head h2{margin:0; font-size:18px; font-weight:900; letter-spacing:.2px}
+  .scr-head .sub{font-size:12px; color:var(--muted)}
+
+  /* ===== Plate ===== */
+  .plate-wrap{display:flex; justify-content:center; margin:14px 0 4px; position:relative}
+  .plate-wrap::before{content:""; position:absolute; width:260px; height:140px; left:50%; top:50%;
+    transform:translate(-50%,-50%); border-radius:50%; pointer-events:none;
+    background:radial-gradient(closest-side, rgba(229,32,59,.35), transparent 72%); filter:blur(6px)}
+  .plate{--h:94px; height:var(--h); width:min(100%,380px); background:linear-gradient(180deg,#fcfcfa,#eceae4); border-radius:12px;
+    border:3px solid #0c0c0c; display:flex; align-items:stretch; overflow:hidden; position:relative; z-index:1;
+    box-shadow:0 18px 40px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.35), 0 0 34px rgba(229,32,59,.18),
+      inset 0 2px 0 rgba(255,255,255,.85), inset 0 -10px 20px rgba(0,0,0,.1); transition:box-shadow .4s}
+  .plate::after{content:""; position:absolute; inset:0; pointer-events:none; z-index:3;
+    background:linear-gradient(105deg, transparent 32%, rgba(255,255,255,.55) 47%, rgba(255,255,255,.1) 54%, transparent 64%);
+    transform:translateX(-120%)}
+  .plate.win::after{animation:sheen .8s ease}
+  @keyframes sheen{to{transform:translateX(120%)}}
+  .plate .eu{width:clamp(42px,12.5vw,52px); flex:none; background:var(--blue); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; color:#fff}
+  .plate .eu .fl{width:25px; height:16px; border-radius:2px; overflow:hidden; box-shadow:0 0 0 1px rgba(255,255,255,.25)}
+  .plate .eu .fl .b{height:50%; background:var(--blue)} .plate .eu .fl .y{height:50%; background:var(--yellow)}
+  .plate .eu .ua{font-weight:800; font-size:13px; letter-spacing:1px}
+  .plate .chars{flex:1; min-width:0; display:flex; align-items:center; justify-content:center; gap:clamp(3px,1.1vw,5px); padding:0 clamp(4px,1.6vw,8px)}
+  .cell{font-family:var(--f-plate); font-weight:900; font-size:clamp(30px,10vw,40px); color:#141414; min-width:clamp(20px,6.5vw,29px); text-align:center; line-height:1; font-variant-numeric:tabular-nums; text-shadow:0 1px 0 rgba(255,255,255,.55), 0 -1px 1px rgba(0,0,0,.12); position:relative; z-index:2}
+  .cell.sp{min-width:clamp(6px,2.1vw,11px)} .cell.spinning{color:#5a5a5a; filter:blur(.5px)}
+  .plate.win{animation:pop .45s ease}
+  @keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.045)}100%{transform:scale(1)}}
+
+  /* ===== Verdict ===== */
+  .verdict{background:linear-gradient(180deg,var(--surface2),var(--surface)); border:1px solid var(--line); border-radius:16px; padding:16px 14px;
+    text-align:center; min-height:138px; display:flex; flex-direction:column; gap:9px; justify-content:center;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04), inset 0 0 40px rgba(229,32,59,.06), 0 10px 28px rgba(0,0,0,.35)}
+  .rank{display:inline-flex; align-items:center; gap:8px; align-self:center; padding:6px 15px; border-radius:999px;
+    font-weight:800; font-size:15px; opacity:0; transform:translateY(6px); transition:.3s}
+  .rank.show{opacity:1; transform:none}
+  .rank.jackpot{animation:glow 1s ease-in-out infinite alternate}
+  @keyframes glow{from{box-shadow:0 0 6px rgba(255,77,109,.45)}to{box-shadow:0 0 24px rgba(255,77,109,.9)}}
+  .price{font-size:34px; font-weight:900; color:var(--gold); font-variant-numeric:tabular-nums; letter-spacing:.5px; text-shadow:0 2px 16px rgba(245,196,81,.3)}
+  .price small{font-size:17px; color:var(--muted); font-weight:700}
+  .evalLabel{font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px}
+  .reasons{display:flex; flex-wrap:wrap; gap:6px; justify-content:center}
+  .tag{font-size:12px; background:var(--surface2); border:1px solid var(--line); color:#efd8de; padding:4px 9px; border-radius:999px}
+  .hint{color:var(--muted); font-size:13px; line-height:1.45}
+
+  /* ===== Buttons ===== */
+  .btn{font-family:inherit; border:1px solid transparent; border-radius:14px; padding:14px 12px; font-weight:800;
+    font-size:15px; cursor:pointer; color:#13121f; transition:transform .05s, filter .15s; width:100%}
+  .btn:active{transform:translateY(1px)} .btn:disabled{opacity:.45; cursor:not-allowed}
+  .btn:hover:not(:disabled){filter:brightness(1.07)}
+  .btn:focus-visible{outline:3px solid var(--gold); outline-offset:2px}
+  .btn.red{background:linear-gradient(180deg,#f23b52,var(--red-d)); color:#fff; border-color:rgba(255,130,150,.3);
+    box-shadow:0 10px 26px rgba(229,32,59,.42), inset 0 1px 0 rgba(255,255,255,.28)}
+  .btn.gold{background:linear-gradient(180deg,var(--gold),var(--gold-d)); box-shadow:0 10px 24px rgba(245,196,81,.3), inset 0 1px 0 rgba(255,255,255,.4)}
+  .btn.green{background:linear-gradient(180deg,#53e0a6,#27b681); color:#06281c; box-shadow:0 10px 22px rgba(53,217,160,.26), inset 0 1px 0 rgba(255,255,255,.3)}
+  .btn.blue{background:linear-gradient(180deg,#3a1a24,#241019); color:var(--gold); border-color:var(--line); box-shadow:0 8px 20px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06)}
+  .btn.ghost{background:var(--surface2); color:var(--txt); border-color:var(--line)}
+  .spin-row{margin-top:2px}
+  .btn-spin{font-size:19px; padding:16px}
+  .btn-spin .cost{display:block; font-size:12px; opacity:.85; font-weight:700; margin-top:2px}
+  .deal{display:flex; gap:10px}
+
+  /* ===== Cards / lists ===== */
+  .card{background:linear-gradient(180deg,var(--surface2),var(--surface)); border:1px solid var(--line); border-radius:16px; padding:14px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03), 0 8px 22px rgba(0,0,0,.28)}
+  .card h3{margin:0 0 4px; font-size:15px; font-weight:800}
+  .card p.muted{margin:0; color:var(--muted); font-size:12.5px; line-height:1.45}
+  .list{display:flex; flex-direction:column; gap:7px}
+  .row{display:flex; align-items:center; gap:10px; background:linear-gradient(180deg,var(--surface2),var(--surface)); border:1px solid var(--line);
+    border-radius:12px; padding:9px 11px; box-shadow:0 4px 12px rgba(0,0,0,.2)}
+  .row .plate-mini{font-weight:900; letter-spacing:.5px; white-space:nowrap; font-size:14px}
+  .row .meta{flex:1; min-width:0}
+  .row .meta .rk{font-size:11px; color:var(--muted)}
+  .row .pr{color:var(--gold); font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap}
+  .row .btn{width:auto; padding:8px 12px; font-size:13px}
+  .empty{color:var(--muted); font-size:13px; text-align:center; padding:22px 8px}
+  .total{display:flex; align-items:center; justify-content:space-between; gap:10px}
+  .total .lbl{color:var(--muted); font-size:13px} .total .amt{color:var(--gold); font-weight:900; font-size:18px; font-variant-numeric:tabular-nums}
+
+  /* ===== Tabs (leaders) ===== */
+  .tabs{display:flex; gap:7px; background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:4px}
+  .tabs button{flex:1; border:0; background:transparent; color:var(--muted); font-weight:800; font-size:13px;
+    padding:9px; border-radius:10px; cursor:pointer; font-family:inherit}
+  .tabs button.on{background:linear-gradient(180deg,#3a1420,#2a0f17); color:var(--gold); box-shadow:inset 0 0 0 1px rgba(245,196,81,.28), 0 4px 12px rgba(0,0,0,.35)}
+  .lb-row{display:flex; align-items:center; gap:10px; padding:9px 11px; border-radius:12px; border:1px solid transparent}
+  .lb-row:nth-child(odd){background:rgba(255,255,255,.015)}
+  .lb-row.me{background:rgba(245,196,81,.12); border-color:rgba(245,196,81,.45)}
+  .lb-row .num{width:30px; text-align:center; font-weight:900; color:var(--muted); font-variant-numeric:tabular-nums}
+  .lb-row.me .num{color:var(--gold)}
+  .lb-row .nm{flex:1; min-width:0; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .lb-row .val{font-weight:800; font-variant-numeric:tabular-nums; color:var(--gold)}
+  .lb-row.spins .val{color:var(--violet)}
+  .lb-sep{height:1px; background:var(--line); margin:4px 0}
+  .medal{font-size:15px}
+
+  /* ===== Shop ===== */
+  .pack{display:flex; align-items:center; gap:12px}
+  .pack .ic{font-size:26px} .pack .info{flex:1} .pack .info .amt{font-weight:900; color:var(--gold); font-size:16px}
+  .pack .info .tag{display:inline-block; margin-top:3px; font-size:10px; font-weight:800; color:#06281c;
+    background:var(--green); padding:2px 7px; border-radius:999px; letter-spacing:.3px}
+  .pack .info .tag.best{background:var(--gold)}
+  .pack .btn{width:auto; padding:10px 14px; white-space:nowrap}
+
+  /* ===== Bottom nav ===== */
+  .bottomnav{flex:none; display:flex; border-top:1px solid var(--line); background:rgba(14,6,9,.97);
+    padding:6px 6px calc(6px + env(safe-area-inset-bottom)); backdrop-filter:blur(10px);
+    box-shadow:0 -1px 0 rgba(229,32,59,.18), 0 -10px 24px rgba(0,0,0,.4)}
+  .navbtn{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; background:transparent;
+    border:0; color:var(--muted); font-family:inherit; font-size:10.5px; font-weight:700; cursor:pointer; padding:7px 2px; border-radius:12px; position:relative}
+  .navbtn .ic{font-size:21px; line-height:1; filter:grayscale(.4) opacity(.8)}
+  .navbtn.on{color:var(--gold)} .navbtn.on .ic{filter:none}
+  .navbtn.on::before{content:""; position:absolute; top:0; width:28px; height:3px; border-radius:3px;
+    background:linear-gradient(90deg,var(--red),var(--gold)); box-shadow:0 0 10px rgba(245,196,81,.6)}
+
+  /* ===== Overlays ===== */
+  #flash{position:fixed; inset:0; pointer-events:none; z-index:55; opacity:0;
+    background:radial-gradient(circle at 50% 40%, rgba(245,196,81,.55), rgba(229,32,59,.3) 42%, transparent 70%); transition:opacity .5s}
+  #fx{position:fixed; inset:0; pointer-events:none; z-index:60}
+  .toast{position:fixed; left:50%; bottom:92px; transform:translateX(-50%) translateY(10px); z-index:65;
+    background:#1c0a11; border:1px solid var(--line); color:var(--txt); padding:11px 16px; border-radius:12px;
+    font-size:13.5px; font-weight:700; box-shadow:0 12px 30px rgba(0,0,0,.5); opacity:0; transition:.25s; max-width:86vw; text-align:center}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .modal-overlay{position:fixed; inset:0; z-index:70; background:rgba(6,2,4,.8); display:flex; align-items:center;
+    justify-content:center; padding:24px; backdrop-filter:blur(3px)}
+  .modal-overlay[hidden]{display:none}
+  .modal-card{background:linear-gradient(180deg,var(--surface2),var(--surface)); border:1px solid var(--line); border-radius:18px; padding:20px; max-width:340px; width:100%; text-align:center;
+    box-shadow:0 30px 70px rgba(0,0,0,.6), 0 0 40px rgba(157,16,36,.2), inset 0 1px 0 rgba(255,255,255,.05)}
+  .modal-card h3{margin:0 0 8px; font-size:17px} .modal-card p{margin:0 0 16px; color:var(--muted); font-size:14px; line-height:1.5}
+  .modal-actions{display:flex; gap:10px} .modal-actions .btn{flex:1}
+  .adbar{height:8px; border-radius:6px; background:var(--surface2); overflow:hidden; margin-top:14px}
+  .adbar > i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--green),var(--gold)); transition:width .1s linear}
+
+  /* ===== Region line ===== */
+  .region{font-size:12.5px; color:var(--muted); margin-top:-2px}
+
+  /* ===== Profile ===== */
+  #profileBody{display:flex; flex-direction:column; gap:13px}
+  .prof-head{display:flex; gap:14px; align-items:center; padding:16px; border-radius:16px; border:1px solid var(--line); box-shadow:inset 0 0 40px rgba(0,0,0,.25)}
+  .avatar{width:66px; height:66px; border-radius:18px; border:2px solid rgba(245,196,81,.45); background:rgba(0,0,0,.35); font-size:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex:none; box-shadow:0 6px 16px rgba(0,0,0,.4), inset 0 0 18px rgba(0,0,0,.4)}
+  .pinfo{flex:1; min-width:0}
+  .pnick{font-weight:900; font-size:19px; display:flex; align-items:center; gap:6px}
+  .editbtn{background:transparent; border:0; cursor:pointer; font-size:14px; opacity:.85}
+  .plvl{color:var(--gold); font-weight:800; font-size:13px; margin:3px 0 5px}
+  .xpbar{height:8px; border-radius:6px; background:rgba(0,0,0,.4); overflow:hidden}
+  .xpbar>i{display:block; height:100%; background:linear-gradient(90deg,var(--red),var(--gold)); box-shadow:0 0 10px rgba(245,196,81,.5)}
+  .xptxt{font-size:11px; color:var(--muted); margin-top:3px; font-variant-numeric:tabular-nums}
+  .daily{display:flex; align-items:center; justify-content:space-between; gap:10px}
+  .daily h3{margin:0; font-size:15px} .daily .btn{width:auto; padding:11px 16px}
+  .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
+  .stat{background:linear-gradient(180deg,var(--surface2),var(--surface)); border:1px solid var(--line); border-radius:12px; padding:10px 8px; text-align:center; box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+  .stat .sv{font-weight:900; font-size:14px; color:var(--gold); font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .stat .sl{font-size:10px; color:var(--muted); margin-top:2px}
+  .achs{display:grid; grid-template-columns:repeat(2,1fr); gap:8px}
+  .ach{display:flex; align-items:center; gap:9px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:9px 11px; opacity:.4; filter:grayscale(1)}
+  .ach.on{opacity:1; filter:none; border-color:rgba(245,196,81,.5); background:linear-gradient(180deg,#2c1119,#1d0b11); box-shadow:0 4px 14px rgba(0,0,0,.3), inset 0 0 18px rgba(245,196,81,.05)}
+  .ach .ai{font-size:22px; flex:none} .ach .an{font-size:12px; font-weight:700; line-height:1.15}
+  .owned{display:grid; grid-template-columns:repeat(2,1fr); gap:8px}
+  .oitem{display:flex; align-items:center; gap:9px; background:linear-gradient(180deg,var(--surface2),var(--surface)); border:1px solid var(--line); border-radius:12px; padding:8px; box-shadow:0 4px 12px rgba(0,0,0,.25)}
+  .oitem .oname{font-size:12.5px; font-weight:700; line-height:1.2; min-width:0; overflow:hidden; text-overflow:ellipsis}
+
+  /* ===== Assets / shop extras ===== */
+  .subprice{font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums}
+  .ownedtag{color:var(--green); font-weight:800; font-size:13px; white-space:nowrap}
+  /* SVG asset illustrations (houses / cars / backgrounds) */
+  .asset-thumb{width:72px; height:54px; border-radius:11px; overflow:hidden; flex:none; position:relative;
+    background:radial-gradient(120% 120% at 50% 0%, #241017, #0e0609); border:1px solid var(--line);
+    box-shadow:inset 0 0 16px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.05)}
+  .asset-thumb svg{display:block; width:100%; height:100%}
+  .asset-thumb .scene{position:absolute; inset:0; width:100%; height:100%}
+  .oitem .asset-thumb{width:50px; height:38px; border-radius:9px}
+  .asset-card{display:flex; align-items:center; gap:12px; background:linear-gradient(180deg,var(--surface2),var(--surface));
+    border:1px solid var(--line); border-radius:14px; padding:10px; box-shadow:0 6px 16px rgba(0,0,0,.3)}
+  .asset-info{flex:1; min-width:0}
+  .asset-name{font-weight:800; font-size:14px; line-height:1.2}
+  .asset-price{font-size:12.5px; color:var(--gold); font-variant-numeric:tabular-nums; margin-top:3px; font-weight:800}
+  .asset-card .btn{width:auto; padding:10px 14px; white-space:nowrap; font-size:13px}
+  .asset-card .ownedtag{margin-right:4px}
+  .avgrid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:8px 0 14px}
+  .avopt{font-size:28px; background:var(--surface2); border:1px solid var(--line); border-radius:12px; padding:8px; cursor:pointer}
+  .avopt.on{border-color:var(--gold); background:rgba(245,196,81,.15)}
+  .nickinput{width:100%; background:var(--surface2); border:1px solid var(--line); border-radius:12px; color:var(--txt); font-family:inherit; font-size:16px; padding:12px; margin:4px 0 16px; text-align:center}
+  .nickinput:focus{outline:2px solid var(--gold)}
+
+  @media (prefers-reduced-motion: reduce){.app.shake{animation:none}.rank.jackpot{animation:none}}
+</style>
+
+<div class="app" id="app">
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="logo"><span class="ico">🎰</span><span class="name"><span class="n1">Номерний&nbsp;</span><span class="dot">Слот</span></span></div>
+    <div class="chips">
+      <div class="chip free" id="freeChip" hidden>🎟 <span class="v" id="freeVal">0</span></div>
+      <div class="chip bal">₴ <span class="v" id="balance">1000</span></div>
+      <button class="iconbtn" id="langBtn" onclick="cycleLang()" aria-label="Language">🇺🇦</button>
+      <button class="iconbtn" id="muteBtn" onclick="toggleMute()" aria-label="Sound">🔊</button>
+    </div>
+  </header>
+
+  <!-- Screens -->
+  <main class="screens" id="screens">
+
+    <!-- GAME -->
+    <section class="screen" data-screen="game">
+      <div class="plate-wrap">
+        <div class="plate" id="plate">
+          <div class="eu"><div class="fl"><div class="b"></div><div class="y"></div></div><div class="ua">UA</div></div>
+          <div class="chars" id="chars">
+            <span class="cell" data-i="0">А</span><span class="cell" data-i="1">А</span>
+            <span class="cell sp"></span>
+            <span class="cell" data-i="2">0</span><span class="cell" data-i="3">0</span>
+            <span class="cell" data-i="4">0</span><span class="cell" data-i="5">0</span>
+            <span class="cell sp"></span>
+            <span class="cell" data-i="6">А</span><span class="cell" data-i="7">А</span>
+          </div>
+        </div>
+      </div>
+      <div class="verdict" id="verdict"></div>
+      <div class="spin-row"><button class="btn red btn-spin" id="spinBtn" onclick="spin()"></button></div>
+      <div class="deal" id="dealActions" style="display:none">
+        <button class="btn green" id="sellBtn" onclick="sellCurrent()"></button>
+        <button class="btn blue" id="keepBtn" onclick="keepCurrent()"></button>
+      </div>
+    </section>
+
+    <!-- COLLECTION -->
+    <section class="screen" data-screen="collection" hidden>
+      <div class="scr-head"><h2 id="colTitle"></h2><span class="sub" id="colCount"></span></div>
+      <div class="card total"><span class="lbl" id="colTotalLbl"></span><span class="amt" id="colTotalAmt">0 ₴</span></div>
+      <button class="btn ghost" id="sellAllBtn" onclick="sellAll()" style="display:none"></button>
+      <div class="list" id="colList"></div>
+    </section>
+
+    <!-- LEADERS -->
+    <section class="screen" data-screen="leaders" hidden>
+      <div class="scr-head"><h2 id="lbTitle"></h2></div>
+      <div class="tabs">
+        <button id="tabMoney" class="on" onclick="setLeaderTab('money')"></button>
+        <button id="tabSpins" onclick="setLeaderTab('spins')"></button>
+      </div>
+      <div class="card" style="padding:7px"><div class="list" id="lbList" style="gap:1px"></div></div>
+    </section>
+
+    <!-- SHOP -->
+    <section class="screen" data-screen="shop" hidden>
+      <div class="scr-head"><h2 id="shopTitle"></h2></div>
+      <div class="tabs">
+        <button id="shTabCur" class="on" onclick="setShopTab('currency')"></button>
+        <button id="shTabAsset" onclick="setShopTab('assets')"></button>
+      </div>
+      <div id="shopCurrency">
+        <div class="card">
+          <h3 id="freeTitle"></h3>
+          <p class="muted" id="freeDesc"></p>
+          <div style="margin-top:12px"><button class="btn green" id="watchAdBtn" onclick="watchAd()"></button></div>
+        </div>
+        <div class="card" style="margin-top:13px"><h3 id="buyTitle" style="margin-bottom:10px"></h3><div class="list" id="packList"></div></div>
+        <p class="muted" id="demoNote" style="text-align:center; padding:10px 6px 0"></p>
+      </div>
+      <div id="shopAssets" hidden></div>
+    </section>
+
+    <!-- PROFILE -->
+    <section class="screen" data-screen="profile" hidden>
+      <div id="profileBody"></div>
+    </section>
+
+  </main>
+
+  <!-- Bottom nav -->
+  <nav class="bottomnav" id="nav"></nav>
+</div>
+
+<div id="flash"></div>
+<canvas id="fx"></canvas>
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="modal" hidden></div>
+
+<script>
+/* ======================= Переклади ======================= */
+const I18N = {
+ uk:{ nav:{game:'Гра',collection:'Колекція',leaders:'Лідери',shop:'Магазин'},
+  spin:'КРУТИТИ', free:'Безкоштовно', evalLabel:'Оцінка номера…',
+  sell:'Продати', keep:'У колекцію',
+  autosold:'Авто-продаж: +{x} ₴', sold:'Продано за {x} ₴', kept:'Додано до колекції 🏆',
+  noFunds:'Недостатньо коштів. Купи валюту або продай номери.',
+  hintStart:'Натисни «Крутити» — слот видасть державний номер, а система миттєво його оцінить.',
+  ranks:{0:'Звичайний',1:'Непоганий',2:'💠 Рідкісний',3:'🏆 Колекційний',4:'💎 ДЖЕКПОТ'},
+  colTitle:'Колекція', colEmpty:'Порожньо. Залиш рідкісний номер у колекції 😉',
+  colCount:'{x} шт.', colTotal:'Сумарна вартість', sellAll:'Продати все за {x} ₴',
+  sellAllConfirm:'Продати всі номери з колекції за {x} ₴?',
+  lbTitle:'Таблиця лідерів', byMoney:'💰 За грошима', bySpins:'🎰 За спінами',
+  you:'Ти', yourRank:'Твоє місце: #{x}',
+  shopTitle:'Магазин', freeTitle:'Безкоштовні спіни', freeDesc:'Переглянь коротке відео й отримай 2 безкоштовні прокрутки.',
+  watchAd:'📺 Дивитися відео (+2 спіни)', adLoading:'Реклама…', adDone:'+2 безкоштовні спіни! 🎉',
+  buyTitle:'Купити валюту', buy:'Купити', popular:'ПОПУЛЯРНЕ', best:'ВИГІДНО',
+  purchased:'Нараховано {x} ₴ ✅', purchaseConfirm:'Демо-покупка: отримати {x} ₴?',
+  demoNote:'Демо-режим: реальну рекламу та платежі під’єднаємо під час публікації в Google Play.',
+  cancel:'Скасувати', ok:'Гаразд',
+  reasons:{quad7:'🍀 Чотири сімки!', quad:'🔥 Чотири однакові {x}', legendary:'👑 Легендарний №{x}',
+   sequence:'➡️ Послідовність {x}', triple:'✨ Три однакові підряд', triple7:'🍀 Три сімки',
+   palindrome:'🔁 Дзеркальний {x}', aabb:'👯 Пари {x}', abab:'🔀 Візерунок {x}', round:'⭕ Круглий {x}',
+   low:'🔽 Низький номер', pairDigits:'• Є парні цифри', allLetters:'🅰️ Усі літери однакові',
+   doubleLetters:'🔠 Подвійні літери', regionSeries:'🔗 Регіон = серія', pairLetters:'🔡 Парні літери',
+   nothing:'Нічого особливого — за безцінок'} },
+
+ en:{ nav:{game:'Play',collection:'Collection',leaders:'Leaders',shop:'Shop'},
+  spin:'SPIN', free:'Free', evalLabel:'Appraising plate…',
+  sell:'Sell', keep:'Keep',
+  autosold:'Auto-sold: +{x} ₴', sold:'Sold for {x} ₴', kept:'Added to collection 🏆',
+  noFunds:'Not enough funds. Buy currency or sell some plates.',
+  hintStart:'Tap “Spin” — the slot rolls a Ukrainian plate and the system appraises it instantly.',
+  ranks:{0:'Common',1:'Decent',2:'💠 Rare',3:'🏆 Collectible',4:'💎 JACKPOT'},
+  colTitle:'Collection', colEmpty:'Empty. Keep a rare plate in your collection 😉',
+  colCount:'{x} pcs', colTotal:'Total value', sellAll:'Sell all for {x} ₴',
+  sellAllConfirm:'Sell every plate in the collection for {x} ₴?',
+  lbTitle:'Leaderboard', byMoney:'💰 By money', bySpins:'🎰 By spins',
+  you:'You', yourRank:'Your place: #{x}',
+  shopTitle:'Shop', freeTitle:'Free spins', freeDesc:'Watch a short video and get 2 free spins.',
+  watchAd:'📺 Watch video (+2 spins)', adLoading:'Ad…', adDone:'+2 free spins! 🎉',
+  buyTitle:'Buy currency', buy:'Buy', popular:'POPULAR', best:'BEST VALUE',
+  purchased:'Credited {x} ₴ ✅', purchaseConfirm:'Demo purchase: get {x} ₴?',
+  demoNote:'Demo mode: real ads and payments will be connected when publishing to Google Play.',
+  cancel:'Cancel', ok:'OK',
+  reasons:{quad7:'🍀 Four sevens!', quad:'🔥 Four identical {x}', legendary:'👑 Legendary No.{x}',
+   sequence:'➡️ Sequence {x}', triple:'✨ Three in a row', triple7:'🍀 Three sevens',
+   palindrome:'🔁 Mirror {x}', aabb:'👯 Pairs {x}', abab:'🔀 Pattern {x}', round:'⭕ Round {x}',
+   low:'🔽 Low number', pairDigits:'• Paired digits', allLetters:'🅰️ All letters identical',
+   doubleLetters:'🔠 Double letters', regionSeries:'🔗 Region = series', pairLetters:'🔡 Paired letters',
+   nothing:'Nothing special — dirt cheap'} },
+
+ ru:{ nav:{game:'Игра',collection:'Коллекция',leaders:'Лидеры',shop:'Магазин'},
+  spin:'КРУТИТЬ', free:'Бесплатно', evalLabel:'Оценка номера…',
+  sell:'Продать', keep:'В коллекцию',
+  autosold:'Авто-продажа: +{x} ₴', sold:'Продано за {x} ₴', kept:'Добавлено в коллекцию 🏆',
+  noFunds:'Недостаточно средств. Купи валюту или продай номера.',
+  hintStart:'Нажми «Крутить» — слот выдаёт госномер, а система мгновенно его оценивает.',
+  ranks:{0:'Обычный',1:'Неплохой',2:'💠 Редкий',3:'🏆 Коллекционный',4:'💎 ДЖЕКПОТ'},
+  colTitle:'Коллекция', colEmpty:'Пусто. Оставь редкий номер в коллекции 😉',
+  colCount:'{x} шт.', colTotal:'Общая стоимость', sellAll:'Продать всё за {x} ₴',
+  sellAllConfirm:'Продать все номера из коллекции за {x} ₴?',
+  lbTitle:'Таблица лидеров', byMoney:'💰 По деньгам', bySpins:'🎰 По спинам',
+  you:'Ты', yourRank:'Твоё место: #{x}',
+  shopTitle:'Магазин', freeTitle:'Бесплатные спины', freeDesc:'Посмотри короткое видео и получи 2 бесплатных прокрутки.',
+  watchAd:'📺 Смотреть видео (+2 спина)', adLoading:'Реклама…', adDone:'+2 бесплатных спина! 🎉',
+  buyTitle:'Купить валюту', buy:'Купить', popular:'ПОПУЛЯРНОЕ', best:'ВЫГОДНО',
+  purchased:'Начислено {x} ₴ ✅', purchaseConfirm:'Демо-покупка: получить {x} ₴?',
+  demoNote:'Демо-режим: реальную рекламу и платежи подключим при публикации в Google Play.',
+  cancel:'Отмена', ok:'Ок',
+  reasons:{quad7:'🍀 Четыре семёрки!', quad:'🔥 Четыре одинаковые {x}', legendary:'👑 Легендарный №{x}',
+   sequence:'➡️ Последовательность {x}', triple:'✨ Три одинаковые подряд', triple7:'🍀 Три семёрки',
+   palindrome:'🔁 Зеркальный {x}', aabb:'👯 Пары {x}', abab:'🔀 Узор {x}', round:'⭕ Круглый {x}',
+   low:'🔽 Низкий номер', pairDigits:'• Есть парные цифры', allLetters:'🅰️ Все буквы одинаковые',
+   doubleLetters:'🔠 Двойные буквы', regionSeries:'🔗 Регион = серия', pairLetters:'🔡 Парные буквы',
+   nothing:'Ничего особенного — за бесценок'} }
+};
+/* Додаткові переклади (нові верхньорівневі ключі — доливаються в I18N без конфліктів) */
+const I18N_EXT={
+ uk:{ vanity:'Іменний номер',
+  profile:{title:'Профіль', level:'Рівень {x}', editNick:'Змінити нік', nickPh:'Твій нік', avatarPick:'Обери аватар', save:'Зберегти',
+   stSpins:'Спінів', stEarned:'Зароблено', stBest:'Найдорожчий', stCol:'У колекції', stRank:'Місце', stAch:'Досягнень',
+   dailyTitle:'Щоденний бонус', dailyClaim:'Забрати 🎁', dailyGot:'Бонус: +{x} ₴ і +2 спіни 🎉', dailyWait:'Бонус уже забрано. Приходь завтра!',
+   achTitle:'Досягнення', owned:'Моє майно', noAssets:'Поки нічого не куплено'},
+  shop:{currency:'💰 Валюта', assets:'🏠 Майно', buy:'Купити', owned:'✓ Куплено', equip:'Надіти', equipped:'✓ Надіто',
+   catHouses:'🏠 Будинки', catCars:'🚗 Авто', catBg:'🖼 Тло профілю', bought:'Придбано: {x} ✅', equippedMsg:'Надіто: {x}', need:'Бракує {x} ₴'},
+  levelUp:'Новий рівень {x}! 🎉', achGot:'🏅 Досягнення: {x}' },
+ en:{ vanity:'Custom plate',
+  profile:{title:'Profile', level:'Level {x}', editNick:'Edit name', nickPh:'Your name', avatarPick:'Pick an avatar', save:'Save',
+   stSpins:'Spins', stEarned:'Earned', stBest:'Best plate', stCol:'In collection', stRank:'Rank', stAch:'Achievements',
+   dailyTitle:'Daily bonus', dailyClaim:'Claim 🎁', dailyGot:'Bonus: +{x} ₴ and +2 spins 🎉', dailyWait:'Already claimed. Come back tomorrow!',
+   achTitle:'Achievements', owned:'My assets', noAssets:'Nothing bought yet'},
+  shop:{currency:'💰 Currency', assets:'🏠 Assets', buy:'Buy', owned:'✓ Owned', equip:'Equip', equipped:'✓ Equipped',
+   catHouses:'🏠 Houses', catCars:'🚗 Cars', catBg:'🖼 Profile background', bought:'Bought: {x} ✅', equippedMsg:'Equipped: {x}', need:'Need {x} ₴ more'},
+  levelUp:'Level up: {x}! 🎉', achGot:'🏅 Achievement: {x}' },
+ ru:{ vanity:'Именной номер',
+  profile:{title:'Профиль', level:'Уровень {x}', editNick:'Изменить ник', nickPh:'Твой ник', avatarPick:'Выбери аватар', save:'Сохранить',
+   stSpins:'Спинов', stEarned:'Заработано', stBest:'Самый дорогой', stCol:'В коллекции', stRank:'Место', stAch:'Достижений',
+   dailyTitle:'Ежедневный бонус', dailyClaim:'Забрать 🎁', dailyGot:'Бонус: +{x} ₴ и +2 спина 🎉', dailyWait:'Бонус уже получен. Приходи завтра!',
+   achTitle:'Достижения', owned:'Моё имущество', noAssets:'Пока ничего не куплено'},
+  shop:{currency:'💰 Валюта', assets:'🏠 Имущество', buy:'Купить', owned:'✓ Куплено', equip:'Надеть', equipped:'✓ Надето',
+   catHouses:'🏠 Дома', catCars:'🚗 Авто', catBg:'🖼 Фон профиля', bought:'Куплено: {x} ✅', equippedMsg:'Надето: {x}', need:'Не хватает {x} ₴'},
+  levelUp:'Новый уровень {x}! 🎉', achGot:'🏅 Достижение: {x}' }
+};
+for(const l in I18N_EXT) Object.assign(I18N[l], I18N_EXT[l]);
+I18N.uk.nav.profile='Профіль'; I18N.en.nav.profile='Profile'; I18N.ru.nav.profile='Профиль';
+const LANGS=['uk','en','ru']; const LANG_FLAG={uk:'🇺🇦',en:'🇬🇧',ru:'🇷🇺'}; const LOCALE={uk:'uk-UA',en:'en-US',ru:'ru-RU'};
+let LANG = load('lang','uk');
+function t(path,p){
+  let v=I18N[LANG]; for(const k of path.split('.')) v=v&&v[k];
+  if(v==null){ v=I18N.uk; for(const k of path.split('.')) v=v&&v[k]; }
+  if(typeof v!=='string') return path;
+  if(p) for(const k in p) v=v.split('{'+k+'}').join(p[k]);
+  return v;
+}
+
+/* ======================= Стан ======================= */
+let balance=load('balance',1000), totalSpins=load('spins',0), freeSpins=load('free',0);
+let collection=load('collection',[]), muted=load('muted',false);
+let current=null, activeScreen='game', leaderTab='money', spinning=false;
+let nick=load('nick',''), avatar=load('avatar','🧑'), xp=load('xp',0);
+let totalEarned=load('earned',0), bestPrice=load('best',0), jackpotCount=load('jackpots',0);
+let owned=load('owned',{}), equippedBg=load('bg',null), dailyLast=load('daily',''), seenSpecials=load('seen',{}), achDone=load('ach',{}), shopTab='currency';
+const SPIN_COST=100, MAX_PRICE=5000000;
+const RANK=[{c:'#ad8893',bg:'rgba(173,136,147,.12)'},{c:'#35d9a0',bg:'rgba(53,217,160,.16)'},
+ {c:'#9b8cff',bg:'rgba(155,140,255,.18)'},{c:'#f5c451',bg:'rgba(245,196,81,.16)'},{c:'#ff4d6d',bg:'rgba(255,77,109,.18)'}];
+
+/* ======================= Номер + оцінка ======================= */
+const LETTERS=['А','В','Е','І','К','М','Н','О','Р','С','Т','Х'];
+const rL=()=>LETTERS[(Math.random()*LETTERS.length)|0]; const rD=()=>(Math.random()*10)|0;
+/* Регіони України: автентичні коди (перша хвиля А/В/С). w=частота появи, f=престиж-множник ціни. */
+const REGION={
+ 'АА':{w:16,f:1.6, n:{uk:'Київ',en:'Kyiv',ru:'Киев'}},
+ 'АІ':{w:10,f:1.25,n:{uk:'Київська обл.',en:'Kyiv oblast',ru:'Киевская обл.'}},
+ 'АВ':{w:6, f:1.0, n:{uk:'Вінницька',en:'Vinnytsia',ru:'Винницкая'}},
+ 'АС':{w:4, f:0.9, n:{uk:'Волинська',en:'Volyn',ru:'Волынская'}},
+ 'АЕ':{w:12,f:1.3, n:{uk:'Дніпропетровська',en:'Dnipro',ru:'Днепропетровская'}},
+ 'АН':{w:8, f:1.2, n:{uk:'Донецька',en:'Donetsk',ru:'Донецкая'}},
+ 'АК':{w:3, f:1.2, n:{uk:'Крим',en:'Crimea',ru:'Крым'}},
+ 'АМ':{w:5, f:0.95,n:{uk:'Житомирська',en:'Zhytomyr',ru:'Житомирская'}},
+ 'АО':{w:5, f:1.05,n:{uk:'Закарпатська',en:'Zakarpattia',ru:'Закарпатская'}},
+ 'АР':{w:8, f:1.15,n:{uk:'Запорізька',en:'Zaporizhzhia',ru:'Запорожская'}},
+ 'АТ':{w:5, f:1.1, n:{uk:'Івано-Франківська',en:'Ivano-Frankivsk',ru:'Ивано-Франковская'}},
+ 'АХ':{w:11,f:1.3, n:{uk:'Харківська',en:'Kharkiv',ru:'Харьковская'}},
+ 'ВА':{w:4, f:0.9, n:{uk:'Кіровоградська',en:'Kirovohrad',ru:'Кировоградская'}},
+ 'ВВ':{w:4, f:1.0, n:{uk:'Луганська',en:'Luhansk',ru:'Луганская'}},
+ 'ВС':{w:10,f:1.35,n:{uk:'Львівська',en:'Lviv',ru:'Львовская'}},
+ 'ВЕ':{w:5, f:1.05,n:{uk:'Миколаївська',en:'Mykolaiv',ru:'Николаевская'}},
+ 'ВН':{w:11,f:1.35,n:{uk:'Одеська',en:'Odesa',ru:'Одесская'}},
+ 'ВІ':{w:6, f:1.05,n:{uk:'Полтавська',en:'Poltava',ru:'Полтавская'}},
+ 'ВК':{w:4, f:0.9, n:{uk:'Рівненська',en:'Rivne',ru:'Ровенская'}},
+ 'ВМ':{w:4, f:0.9, n:{uk:'Сумська',en:'Sumy',ru:'Сумская'}},
+ 'ВО':{w:4, f:0.95,n:{uk:'Тернопільська',en:'Ternopil',ru:'Тернопольская'}},
+ 'ВТ':{w:4, f:0.95,n:{uk:'Херсонська',en:'Kherson',ru:'Херсонская'}},
+ 'ВХ':{w:5, f:0.95,n:{uk:'Хмельницька',en:'Khmelnytskyi',ru:'Хмельницкая'}},
+ 'СА':{w:5, f:1.0, n:{uk:'Черкаська',en:'Cherkasy',ru:'Черкасская'}},
+ 'СВ':{w:4, f:0.9, n:{uk:'Чернігівська',en:'Chernihiv',ru:'Черниговская'}},
+ 'СС':{w:3, f:0.95,n:{uk:'Чернівецька',en:'Chernivtsi',ru:'Черновицкая'}},
+ 'СН':{w:2, f:1.15,n:{uk:'Севастополь',en:'Sevastopol',ru:'Севастополь'}}
+};
+const REGION_CODES=Object.keys(REGION), REGION_TOTAL=REGION_CODES.reduce((a,c)=>a+REGION[c].w,0);
+function pickRegion(){ if(Math.random()<0.12) return rL()+rL();
+  let r=Math.random()*REGION_TOTAL; for(const c of REGION_CODES){ r-=REGION[c].w; if(r<=0) return c; } return 'АА'; }
+function regionFactor(code){ return REGION[code]?REGION[code].f:1; }
+function regionLabel(code){ const r=REGION[code]; return r?('📍 '+(r.n[LANG]||r.n.uk)):('🔖 '+t('vanity')); }
+/* Особливі номери-винятки: фіксована ціна має пріоритет над звичайною оцінкою.
+   Легко розширювати — додай об'єкт з test() і ціною. (1488 та інші символи ненависті НЕ додаємо.) */
+const SPECIAL=[
+ {id:'vor',  price:3000000, tier:4, test:(r,d,s)=> r==='ВО'&&s==='ОР',
+   label:{uk:'🃏 «ВОР» — кримінальний шик', en:'🃏 “VOR” — outlaw chic', ru:'🃏 «ВОР» — криминальный шик'}},
+ {id:'007',  price:1200000, tier:4, test:(r,d,s)=> d==='0007',
+   label:{uk:'🕵️ Агент 007', en:'🕵️ Agent 007', ru:'🕵️ Агент 007'}},
+ {id:'tato', price:700000,  tier:3, test:(r,d,s)=> r==='ТА'&&s==='ТО',
+   label:{uk:'👨‍👧 «ТАТО»', en:'👨‍👧 “DAD”', ru:'👨‍👧 «ПАПА»'}},
+ {id:'mama', price:700000,  tier:3, test:(r,d,s)=> r==='МА'&&s==='МА',
+   label:{uk:'👩‍👧 «МАМА»', en:'👩‍👧 “MOM”', ru:'👩‍👧 «МАМА»'}}
+];
+function specialFor(r,d,s){ let best=null; for(const sp of SPECIAL){ if(sp.test(r,d,s)&&(!best||sp.price>best.price)) best=sp; } return best; }
+function evaluate(region,digits,series){
+  const sp=specialFor(region,digits,series);
+  if(sp) return {price:Math.min(sp.price,MAX_PRICE), tier:sp.tier, reasons:[{special:sp.label}], special:sp.id};
+  const s=digits, set=new Set(s.split('')), val=parseInt(s,10), allSame=set.size===1;
+  let df=1, dr=null; const put=(f,k,x)=>{ if(f>df){df=f; dr={k,x};} };
+  if(allSame){ if(s==='7777') put(2600,'quad7'); else put(1900,'quad',s); }
+  if(val>=1&&val<=10)            put(1250,'legendary',val);
+  if(isSeqUp(s)||isSeqDown(s))   put(620,'sequence',s);
+  if(hasTriple(s)&&!allSame)     put(270,'triple');
+  if(/777/.test(s)&&!allSame)    put(330,'triple7');
+  if(isPalindrome(s)&&!allSame)  put(120,'palindrome',s);
+  if(isAABB(s))                  put(95,'aabb',s);
+  if(isABAB(s))                  put(95,'abab',s);
+  if(/000$/.test(s)&&!allSame)   put(78,'round',s);
+  if(val>=11&&val<=100)          put(44,'low');
+  if(!dr&&/(\d)\1/.test(s))      put(6,'pairDigits');
+  const regPair=region[0]===region[1], serPair=series[0]===series[1];
+  let lf=1, lr=null;
+  if(regPair&&serPair&&region[0]===series[0]){lf=56; lr={k:'allLetters'};}
+  else if(regPair&&serPair){lf=9; lr={k:'doubleLetters'};}
+  else if(region===series){lf=8; lr={k:'regionSeries'};}
+  else if(regPair||serPair){lf=3; lr={k:'pairLetters'};}
+  let price=Math.round(50*df*lf*(0.94+Math.random()*0.12)*regionFactor(region));
+  price=Math.max(50,Math.min(price,MAX_PRICE)); price=roundNice(price);
+  const reasons=[dr,lr].filter(Boolean); if(!reasons.length) reasons.push({k:'nothing'});
+  let tier; if(price>=1000000)tier=4; else if(price>=100000)tier=3; else if(price>=10000)tier=2; else if(price>=1000)tier=1; else tier=0;
+  return {price,tier,reasons};
+}
+function roundNice(p){ if(p>=1e6)return Math.round(p/5e4)*5e4; if(p>=1e5)return Math.round(p/5e3)*5e3;
+  if(p>=1e4)return Math.round(p/500)*500; if(p>=1e3)return Math.round(p/50)*50; return Math.round(p/10)*10; }
+function isSeqUp(s){for(let i=1;i<s.length;i++)if(+s[i]!==+s[i-1]+1)return false;return true;}
+function isSeqDown(s){for(let i=1;i<s.length;i++)if(+s[i]!==+s[i-1]-1)return false;return true;}
+function isPalindrome(s){return s===s.split('').reverse().join('');}
+function isAABB(s){return s[0]===s[1]&&s[2]===s[3]&&s[0]!==s[2];}
+function isABAB(s){return s[0]===s[2]&&s[1]===s[3]&&s[0]!==s[1];}
+function hasTriple(s){return /(.)\1\1/.test(s);}
+function reasonText(r){return r.special?(r.special[LANG]||r.special.uk):t('reasons.'+r.k, r.x!=null?{x:r.x}:null);}
+
+/* ======================= Аудіо ======================= */
+let actx=null;
+function ensureAudio(){ if(!actx){try{actx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}} if(actx&&actx.state==='suspended')actx.resume(); }
+function tone(freq,dur,type='sine',gain=0.15,when=0){ if(muted||!actx)return;
+  const t0=actx.currentTime+when, o=actx.createOscillator(), g=actx.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,t0); g.gain.setValueAtTime(0,t0);
+  g.gain.linearRampToValueAtTime(gain,t0+0.01); g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  o.connect(g).connect(actx.destination); o.start(t0); o.stop(t0+dur+0.02); }
+const sndLock=()=>tone(180+Math.random()*40,0.06,'square',0.08);
+const sndBlip=p=>tone(320+p*1100,0.05,'triangle',0.06);
+function sndWin(tier){ const b=[523.25,659.25,783.99,1046.5,1318.5,1568]; const n=[2,3,4,6][Math.min(tier-1,3)]||2;
+  for(let i=0;i<n;i++) tone(b[i%b.length]*(i>=6?2:1),0.22,'triangle',0.14,i*0.1); }
+function sndJackpot(){ [523,587,659,698,784,880,988,1047,1319,1568].forEach((f,i)=>tone(f,0.18,'sawtooth',0.10,i*0.07));
+  [1568,2093,2637].forEach((f,i)=>tone(f,0.6,'triangle',0.12,0.8+i*0.12)); }
+
+/* ======================= Ефекти ======================= */
+const fx=document.getElementById('fx'), fxc=fx.getContext('2d'); let parts=[], raf=null;
+function sizeFx(){ fx.width=innerWidth; fx.height=innerHeight; } addEventListener('resize',sizeFx); sizeFx();
+function confetti(n,pow){ const cols=['#f5c451','#e5203b','#ffd700','#ff4d6d','#fff','#9d1024'];
+  const cx=innerWidth/2, cy=innerHeight*0.36;
+  for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2, sp=(2+Math.random()*6)*pow;
+    parts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-6*pow,g:0.18+Math.random()*0.12,
+     s:4+Math.random()*6,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:cols[(Math.random()*cols.length)|0],life:1}); }
+  if(!raf) raf=requestAnimationFrame(stepFx); }
+function stepFx(){ fxc.clearRect(0,0,fx.width,fx.height); parts=parts.filter(p=>p.life>0);
+  parts.forEach(p=>{ p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; p.life-=0.008;
+    fxc.save(); fxc.globalAlpha=Math.max(0,p.life); fxc.translate(p.x,p.y); fxc.rotate(p.r);
+    fxc.fillStyle=p.c; fxc.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6); fxc.restore(); });
+  if(parts.length) raf=requestAnimationFrame(stepFx); else{ fxc.clearRect(0,0,fx.width,fx.height); raf=null; } }
+function shake(){ const a=document.getElementById('app'); a.classList.remove('shake'); void a.offsetWidth; a.classList.add('shake'); }
+function goldFlash(){ const f=document.getElementById('flash'); f.style.opacity='1'; setTimeout(()=>f.style.opacity='0',120); }
+function vibrate(p){ if(navigator.vibrate) try{navigator.vibrate(p);}catch(e){} }
+
+/* ======================= DEV / чит-режим (тільки для тесту) ======================= */
+let RIG=false, FORCE=null;
+function rigPlate(){
+  const nice=['1111','7777','0001','0007','1234','4321','1212','1221','1122','7770','9999','0100','1000','2222','0777'];
+  const d=nice[(Math.random()*nice.length)|0], L=()=>LETTERS[(Math.random()*LETTERS.length)|0], roll=Math.random();
+  let region,series;
+  if(roll<0.30){ const a=L(); region=a+a; series=a+a; }          // усі літери однакові → максимум
+  else if(roll<0.62){ region=pickRegion(); const b=L(); series=b+b; } // валідний регіон + подвійна серія
+  else { region=pickRegion(); series=L()+L(); }
+  return {region,digits:d,series};
+}
+window.luck  = (on=true)=>{ RIG=!!on; return RIG?'🔥 Чит УВІМКНЕНО — тисни КРУТИТИ (дорогі номери)':'Чит вимкнено'; };
+window.maxwin= ()=>{ FORCE={region:'АА',digits:'1111',series:'АА'}; return '💎 Наступний спін — ДЖЕКПОТ 5 000 000 ₴. Тисни КРУТИТИ'; };
+window.vor   = ()=>{ FORCE={region:'ВО',digits:''+(1000+((Math.random()*9000)|0)),series:'ОР'}; return '🃏 Наступний спін — ВОР. Тисни КРУТИТИ'; };
+try{ console.log('%cDEV ЧИТИ: luck(true) — дорогі · maxwin() — джекпот · vor() — особливий «ВОР» · luck(false) — вимкнути','color:#f5c451;font-weight:bold'); }catch(e){}
+
+/* ======================= Слот ======================= */
+function spin(){
+  if(spinning) return; ensureAudio();
+  if(current){ const p=current.price; balance+=p; trackEarn(p); addXp(1); current=null; document.getElementById('dealActions').style.display='none'; save('balance',balance); updateTopbar(); showToast(t('autosold',{x:fmt(p)})); }
+  if(freeSpins>0){ freeSpins--; save('free',freeSpins); }
+  else if(balance>=SPIN_COST){ balance-=SPIN_COST; }
+  else { showToast(t('noFunds')); switchScreen('shop'); return; }
+  totalSpins++; save('spins',totalSpins); save('balance',balance); updateTopbar(); updateSpinBtn();
+  spinning=true;
+  document.getElementById('spinBtn').disabled=true;
+  const plate=document.getElementById('plate'); plate.classList.remove('win'); plate.style.boxShadow='';
+  document.getElementById('verdict').innerHTML='<div class="evalLabel">'+t('evalLabel')+'</div><div class="price" id="priceValue">0 <small>₴</small></div>';
+  let region,digits,series;
+  if(FORCE){ ({region,digits,series}=FORCE); FORCE=null; }
+  else if(RIG){ ({region,digits,series}=rigPlate()); }
+  else { region=pickRegion(); digits=''+rD()+rD()+rD()+rD(); series=rL()+rL(); }
+  const final=(region+digits+series).split('');
+  const cells=[...document.querySelectorAll('.cell[data-i]')];
+  cells.forEach(c=>c.classList.add('spinning'));
+  const lockAt=[240,380,540,680,820,960,1140,1280], start=performance.now();
+  const tick=now=>{ const tt=now-start;
+    cells.forEach((c,i)=>{ if(c.classList.contains('spinning')){
+      if(tt>=lockAt[i]){ c.textContent=final[i]; c.classList.remove('spinning'); sndLock(); }
+      else c.textContent=(i<2||i>5)?rL():rD(); } });
+    if(cells.some(c=>c.classList.contains('spinning'))) requestAnimationFrame(tick);
+    else finishSpin(region,digits,series); };
+  requestAnimationFrame(tick);
+}
+function finishSpin(region,digits,series){
+  const res=evaluate(region,digits,series);
+  current={region,digits,series,plate:region+' '+digits+' '+series,...res};
+  if(res.price>bestPrice){ bestPrice=res.price; save('best',bestPrice); }
+  if(res.tier===4){ jackpotCount++; save('jackpots',jackpotCount); }
+  if(res.special){ seenSpecials[res.special]=true; save('seen',seenSpecials); }
+  addXp(15+Math.floor(res.price/20000)); checkAch();
+  const plate=document.getElementById('plate'); plate.classList.add('win');
+  if(res.tier>=2) plate.style.boxShadow='0 14px 32px rgba(0,0,0,.5), 0 0 26px '+RANK[res.tier].c;
+  countUp(res.price,res.tier,()=>{ spinning=false; document.getElementById('dealActions').style.display='flex';
+    document.getElementById('sellBtn').textContent=t('sell'); document.getElementById('keepBtn').textContent=t('keep');
+    updateSpinBtn(); });
+}
+function countUp(target,tier,done){
+  const el=document.getElementById('priceValue');
+  const dur=target<500?550:Math.min(3800,700+Math.log10(target)*560);
+  const start=performance.now(); let lastBlip=0;
+  const step=now=>{ const p=Math.min(1,(now-start)/dur), e=1-Math.pow(1-p,3), cur=Math.round(target*e);
+    if(el) el.innerHTML=fmt(cur)+' <small>₴</small>';
+    if(now-lastBlip>70&&p<1){ sndBlip(p); lastBlip=now; }
+    if(p<1) requestAnimationFrame(step);
+    else{ if(el) el.innerHTML=fmt(target)+' <small>₴</small>'; celebrate(tier); done&&done(); } };
+  requestAnimationFrame(step);
+}
+function verdictResultHTML(animate){ const tier=current.tier, rk=RANK[tier];
+  return '<div class="rank '+(animate?'':'show ')+(tier>=4?'jackpot':'')+'" style="color:'+rk.c+';background:'+rk.bg+'">'+t('ranks.'+tier)+'</div>'+
+    '<div class="region">'+regionLabel(current.region)+'</div>'+
+    '<div class="price">'+fmt(current.price)+' <small>₴</small></div>'+
+    '<div class="reasons">'+current.reasons.map(r=>'<span class="tag">'+reasonText(r)+'</span>').join('')+'</div>'; }
+function celebrate(tier){
+  document.getElementById('verdict').innerHTML=verdictResultHTML(true);
+  requestAnimationFrame(()=>document.querySelector('.rank')?.classList.add('show'));
+  if(tier===1) sndWin(1);
+  else if(tier===2){ confetti(70,1); sndWin(2); }
+  else if(tier===3){ confetti(130,1.3); sndWin(3); shake(); vibrate(60); }
+  else if(tier===4){ confetti(260,1.8); sndJackpot(); shake(); goldFlash(); vibrate([0,80,40,80,40,160]);
+    setTimeout(()=>confetti(160,1.5),350); setTimeout(()=>confetti(160,1.5),700); }
+}
+
+/* ======================= Угоди ======================= */
+function sellCurrent(){ if(!current)return; const p=current.price; balance+=p; trackEarn(p); addXp(Math.max(1,Math.floor(p/5000))); save('balance',balance);
+  showToast(t('sold',{x:fmt(p)})); current=null; document.getElementById('dealActions').style.display='none'; updateTopbar(); checkAch(); }
+function keepCurrent(){ if(!current)return;
+  collection.unshift({plate:current.plate,price:current.price,tier:current.tier});
+  collection.sort((a,b)=>b.price-a.price); collection=collection.slice(0,100); save('collection',collection); addXp(25);
+  showToast(t('kept')); current=null; document.getElementById('dealActions').style.display='none'; checkAch(); }
+function sellFromCollection(i){ const it=collection[i]; if(!it)return; balance+=it.price; trackEarn(it.price); addXp(Math.max(1,Math.floor(it.price/5000))); collection.splice(i,1);
+  save('balance',balance); save('collection',collection); updateTopbar(); renderCollection(); showToast(t('sold',{x:fmt(it.price)})); checkAch(); }
+function sellAll(){ if(!collection.length)return; const sum=collection.reduce((a,b)=>a+b.price,0);
+  showConfirm(t('sellAllConfirm',{x:fmt(sum)}),()=>{ balance+=sum; trackEarn(sum); collection=[]; save('balance',balance); save('collection',collection);
+    updateTopbar(); renderCollection(); showToast(t('sold',{x:fmt(sum)})); checkAch(); }); }
+
+/* ======================= Лідери (боти) ======================= */
+let bots=load('bots',null);
+if(!bots){ bots=genBots(); save('bots',bots); }
+function genBots(){
+  const names=['Schumacher','PlateKing','VIP_777','DriftKyiv','GoldNomer','LuckyAA','Baron','Tuz','Fortuna','MegaWin',
+   'Boss','Legenda','Phantom','NightRider','Turbo','Alfa','Omega','Kobra','Falcon','Magnat','Shadow','Pirate','Zenit',
+   'Comet','Titan','Vortex','Blitz','Nova','RexAuto','Diamond','Khan','Viktor_UA','SlotMaster','BigFish','Lev','Sokil',
+   'Iron','Maestro','Pandora','Cyber','Gambit','Orion','Vega','Spartak','Kozak','Hetman','Buran','Mustang','Reactor','Quasar'];
+  const out=[]; const used=new Set();
+  for(let i=0;i<99;i++){ let nm=names[(Math.random()*names.length)|0]; if(used.has(nm)||Math.random()<0.5) nm+=((Math.random()*990)|0)+10; used.add(nm);
+    out.push({name:nm, money:Math.floor(500+Math.pow(Math.random(),3)*60000000), spins:Math.floor(10+Math.pow(Math.random(),2.2)*70000)}); }
+  return out;
+}
+function leaderRows(tab){
+  const key=tab==='spins'?'spins':'money';
+  const me={name:nick||t('you'), money:balance, spins:totalSpins, me:true};
+  const all=bots.concat([me]).sort((a,b)=>b[key]-a[key]);
+  const rank=all.findIndex(x=>x.me)+1;
+  const top=all.slice(0,100); const inTop=top.some(x=>x.me);
+  return {top,rank,inTop,me,key};
+}
+
+/* ======================= Профіль · прогрес · майно ======================= */
+const AVATARS=['🧑','👩','🧔','🤠','🦸','🕵️','🧑‍🎤','🐉','🦊','👑','🤖','🥷'];
+const ASSETS=[
+ {id:'h1',cat:'houses',price:50000,  ic:'🏚',n:{uk:'Квартира',en:'Flat',ru:'Квартира'}},
+ {id:'h2',cat:'houses',price:300000, ic:'🏠',n:{uk:'Будинок',en:'House',ru:'Дом'}},
+ {id:'h3',cat:'houses',price:1200000,ic:'🏡',n:{uk:'Котедж',en:'Cottage',ru:'Коттедж'}},
+ {id:'h4',cat:'houses',price:5000000,ic:'🏰',n:{uk:'Маєток',en:'Mansion',ru:'Поместье'}},
+ {id:'c1',cat:'cars',price:80000,    ic:'🚗',n:{uk:'Вживане авто',en:'Used car',ru:'Б/у авто'}},
+ {id:'c2',cat:'cars',price:450000,   ic:'🚙',n:{uk:'Кросовер',en:'Crossover',ru:'Кроссовер'}},
+ {id:'c3',cat:'cars',price:2000000,  ic:'🏎',n:{uk:'Спорткар',en:'Sports car',ru:'Спорткар'}},
+ {id:'c4',cat:'cars',price:4500000,  ic:'🛻',n:{uk:'Преміум пікап',en:'Premium truck',ru:'Премиум пикап'}},
+ {id:'b1',cat:'bg',price:20000, bg:'linear-gradient(135deg,#243b55,#141e30)', ic:'🌆',n:{uk:'Місто',en:'City',ru:'Город'}},
+ {id:'b2',cat:'bg',price:80000, bg:'linear-gradient(135deg,#0f2027,#2c5364)', ic:'🌃',n:{uk:'Ніч',en:'Night',ru:'Ночь'}},
+ {id:'b3',cat:'bg',price:200000,bg:'linear-gradient(135deg,#1e3c72,#2a5298)', ic:'🏔',n:{uk:'Гори',en:'Mountains',ru:'Горы'}},
+ {id:'b4',cat:'bg',price:500000,bg:'linear-gradient(135deg,#2a0a1f,#5c0a16)', ic:'🌌',n:{uk:'Космос',en:'Space',ru:'Космос'}}
+];
+/* Намальовані SVG-ілюстрації майна (будинки/авто) + сцени тла — замість стокових емодзі.
+   Стиль: темно-червоні корпуси, золоті вікна/фари, дрібна тінь. Унікальні координати на кожен об'єкт. */
+const ART={
+ h1:`<svg viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><ellipse cx="40" cy="51" rx="26" ry="3.5" fill="#000" opacity=".4"/><rect x="25" y="9" width="30" height="42" rx="2" fill="#3a2029"/><rect x="25" y="9" width="30" height="4.5" fill="#9d1024"/><g fill="#f5c451"><rect x="29" y="17" width="5" height="5" rx="1"/><rect x="37.5" y="17" width="5" height="5" rx="1" opacity=".5"/><rect x="46" y="17" width="5" height="5" rx="1"/><rect x="29" y="26" width="5" height="5" rx="1" opacity=".5"/><rect x="37.5" y="26" width="5" height="5" rx="1"/><rect x="46" y="26" width="5" height="5" rx="1"/><rect x="29" y="35" width="5" height="5" rx="1"/><rect x="37.5" y="35" width="5" height="5" rx="1" opacity=".5"/><rect x="46" y="35" width="5" height="5" rx="1"/></g><rect x="36" y="43" width="8" height="8" rx="1" fill="#1a0d12"/></svg>`,
+ h2:`<svg viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><ellipse cx="40" cy="51" rx="28" ry="3.5" fill="#000" opacity=".4"/><rect x="49" y="13" width="5" height="10" fill="#5c0a16"/><rect x="22" y="28" width="36" height="23" fill="#3a2029"/><polygon points="40,10 63,29 17,29" fill="#c22a3f"/><polygon points="40,10 63,29 55,29 40,15.5" fill="#9d1024"/><rect x="26" y="34" width="8" height="8" rx="1" fill="#f5c451"/><rect x="46" y="34" width="8" height="8" rx="1" fill="#f5c451"/><rect x="36" y="40" width="9" height="11" rx="1" fill="#1a0d12"/></svg>`,
+ h3:`<svg viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><ellipse cx="40" cy="51" rx="30" ry="3.5" fill="#000" opacity=".4"/><rect x="43" y="35" width="24" height="16" fill="#2f1a22"/><polygon points="43,35 55,27 67,35" fill="#b02437"/><rect x="13" y="27" width="31" height="24" fill="#3a2029"/><polygon points="13,27 28,15 43,27" fill="#c22a3f"/><rect x="18" y="33" width="7" height="7" rx="1" fill="#f5c451"/><rect x="31" y="33" width="7" height="7" rx="1" fill="#f5c451"/><rect x="23" y="41" width="8" height="10" rx="1" fill="#1a0d12"/><rect x="48" y="39" width="15" height="12" rx="1" fill="#120a0e"/></svg>`,
+ h4:`<svg viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><ellipse cx="40" cy="51" rx="33" ry="3.5" fill="#000" opacity=".4"/><rect x="11" y="24" width="58" height="27" fill="#3a2029"/><polygon points="40,8 71,24 9,24" fill="#c22a3f"/><polygon points="30,24 40,15 50,24" fill="#f5c451"/><g fill="#e8d7cd"><rect x="15" y="30" width="3.5" height="21"/><rect x="23" y="30" width="3.5" height="21"/><rect x="53.5" y="30" width="3.5" height="21"/><rect x="61.5" y="30" width="3.5" height="21"/></g><rect x="31" y="28" width="6" height="6" rx="1" fill="#f5c451"/><rect x="43" y="28" width="6" height="6" rx="1" fill="#f5c451"/><rect x="34" y="37" width="12" height="14" rx="1" fill="#1a0d12"/><rect x="36" y="39" width="8" height="12" fill="#6b3b22"/><rect x="28" y="49" width="24" height="2.5" fill="#2a151c"/></svg>`,
+ c1:`<svg viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><ellipse cx="40" cy="47" rx="32" ry="3.5" fill="#000" opacity=".4"/><path d="M9 40 L9 35 Q9 32 13 31 L25 31 L32 23 Q34 21 38 21 L50 21 Q54 21 57 24 L63 31 L70 33 Q73 34 73 38 L73 40 Q73 42 71 42 L11 42 Q9 42 9 40 Z" fill="#8f2232"/><path d="M33 24 L38 24 L38 30 L28 30 Z" fill="#cfe2ea"/><path d="M40 24 L50 24 Q53 24 55 26.5 L57 30 L40 30 Z" fill="#cfe2ea"/><rect x="69.5" y="33.5" width="3.5" height="3" rx="1" fill="#f5c451"/><circle cx="24" cy="42" r="6.5" fill="#120a0e"/><circle cx="24" cy="42" r="2.8" fill="#b8b0ad"/><circle cx="58" cy="42" r="6.5" fill="#120a0e"/><circle cx="58" cy="42" r="2.8" fill="#b8b0ad"/></svg>`,
+ c2:`<svg viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><ellipse cx="40" cy="47" rx="33" ry="3.5" fill="#000" opacity=".4"/><rect x="27" y="16" width="29" height="2" rx="1" fill="#2a151c"/><path d="M8 41 L8 33 Q8 30 12 29 L22 29 L27 20 Q29 18 33 18 L54 18 Q58 18 60 21 L66 29 L71 31 Q74 32 74 36 L74 41 Q74 42 72 42 L10 42 Q8 42 8 41 Z" fill="#b02437"/><path d="M30 21 L41 21 L41 28 L26 28 Z" fill="#cfe2ea"/><path d="M43 21 L54 21 Q57 21 58.5 23.5 L61 28 L43 28 Z" fill="#cfe2ea"/><rect x="70.5" y="32.5" width="3.5" height="3" rx="1" fill="#f5c451"/><circle cx="23" cy="42" r="7" fill="#120a0e"/><circle cx="23" cy="42" r="3" fill="#b8b0ad"/><circle cx="59" cy="42" r="7" fill="#120a0e"/><circle cx="59" cy="42" r="3" fill="#b8b0ad"/></svg>`,
+ c3:`<svg viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><ellipse cx="40" cy="45" rx="35" ry="3.5" fill="#000" opacity=".4"/><path d="M5 39 L8 34 Q10 32 15 31 L30 30 L38 25 Q42 22 50 22 L59 22 Q67 23 72 28 L77 33 Q79 34 79 37 L79 39 Q79 40 77 40 L7 40 Q5 40 5 39 Z" fill="#e5203b"/><path d="M39 26 L49 23.5 L59 25 L61 30 L38 30 Z" fill="#cfe2ea"/><rect x="10" y="36" width="66" height="2" fill="#f5c451"/><rect x="75.5" y="33" width="3.5" height="3" rx="1" fill="#fff"/><circle cx="23" cy="40" r="6.5" fill="#120a0e"/><circle cx="23" cy="40" r="2.8" fill="#d8cf8f"/><circle cx="60" cy="40" r="6.5" fill="#120a0e"/><circle cx="60" cy="40" r="2.8" fill="#d8cf8f"/></svg>`,
+ c4:`<svg viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><ellipse cx="40" cy="47" rx="33" ry="3.5" fill="#000" opacity=".4"/><rect x="38" y="29" width="34" height="13" rx="1" fill="#4a2730"/><rect x="38" y="29" width="34" height="3" fill="#2a151c"/><path d="M8 42 L8 32 Q8 29 12 28 L18 28 L24 20 Q26 18 30 18 L39 18 L39 42 Z" fill="#a0202f"/><path d="M25 21 L37 21 L37 27 L21 27 Z" fill="#cfe2ea"/><rect x="8" y="33.5" width="3" height="3" rx="1" fill="#f5c451"/><circle cx="22" cy="42" r="7" fill="#120a0e"/><circle cx="22" cy="42" r="3" fill="#b8b0ad"/><circle cx="60" cy="42" r="7" fill="#120a0e"/><circle cx="60" cy="42" r="3" fill="#b8b0ad"/></svg>`
+};
+const SCENE={
+ b1:`<svg class="scene" viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice"><g fill="rgba(0,0,0,.42)"><rect x="4" y="30" width="11" height="26"/><rect x="17" y="22" width="10" height="34"/><rect x="29" y="34" width="9" height="22"/><rect x="40" y="15" width="11" height="41"/><rect x="53" y="27" width="10" height="29"/><rect x="65" y="23" width="11" height="33"/></g><g fill="rgba(245,196,81,.9)"><rect x="19" y="26" width="2" height="2"/><rect x="23" y="31" width="2" height="2"/><rect x="43" y="19" width="2" height="2"/><rect x="47" y="26" width="2" height="2"/><rect x="67" y="27" width="2" height="2"/><rect x="71" y="33" width="2" height="2"/></g></svg>`,
+ b2:`<svg class="scene" viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice"><circle cx="57" cy="15" r="7" fill="rgba(245,196,81,.85)"/><g fill="rgba(255,255,255,.8)"><circle cx="18" cy="12" r="1"/><circle cx="30" cy="20" r="1"/><circle cx="40" cy="10" r="1"/><circle cx="70" cy="30" r="1"/><circle cx="12" cy="26" r="1"/></g><path d="M0 56 Q20 40 40 46 Q60 52 80 42 L80 56 Z" fill="rgba(0,0,0,.45)"/></svg>`,
+ b3:`<svg class="scene" viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice"><circle cx="17" cy="15" r="6" fill="rgba(245,196,81,.8)"/><polygon points="0,56 24,24 46,56" fill="rgba(0,0,0,.4)"/><polygon points="26,56 50,16 74,56" fill="rgba(0,0,0,.52)"/><polygon points="46,56 66,30 80,56" fill="rgba(0,0,0,.34)"/><polygon points="50,16 44,26 56,26" fill="rgba(255,255,255,.7)"/></svg>`,
+ b4:`<svg class="scene" viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><g fill="rgba(255,255,255,.85)"><circle cx="12" cy="14" r="1.1"/><circle cx="26" cy="36" r="1"/><circle cx="34" cy="12" r="1.2"/><circle cx="20" cy="46" r="1"/><circle cx="66" cy="42" r="1.1"/><circle cx="72" cy="12" r="1"/><circle cx="44" cy="44" r="1"/></g><ellipse cx="50" cy="26" rx="18" ry="5" fill="none" stroke="rgba(245,196,81,.75)" stroke-width="1.6" transform="rotate(-18 50 26)"/><circle cx="50" cy="26" r="10" fill="rgba(229,32,59,.55)"/><circle cx="46" cy="22" r="3" fill="rgba(255,255,255,.18)"/></svg>`
+};
+function assetThumbInner(a){
+  if(a.cat==='bg') return '<div class="scene" style="background:'+a.bg+'"></div>'+(SCENE[a.id]||'');
+  return ART[a.id]||('<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:26px">'+a.ic+'</div>');
+}
+const ACH=[
+ {id:'first',  ic:'🎰',reward:500,   cond:()=>totalSpins>=1,         n:{uk:'Перший спін',en:'First spin',ru:'Первый спин'}},
+ {id:'spin100',ic:'🔄',reward:5000,  cond:()=>totalSpins>=100,       n:{uk:'100 спінів',en:'100 spins',ru:'100 спинов'}},
+ {id:'rare',   ic:'💠',reward:3000,  cond:()=>bestPrice>=10000,      n:{uk:'Рідкісний номер',en:'A rare plate',ru:'Редкий номер'}},
+ {id:'jack',   ic:'💎',reward:50000, cond:()=>jackpotCount>=1,       n:{uk:'Джекпот!',en:'Jackpot!',ru:'Джекпот!'}},
+ {id:'col10',  ic:'🗂',reward:10000, cond:()=>collection.length>=10, n:{uk:'Колекціонер',en:'Collector',ru:'Коллекционер'}},
+ {id:'lvl5',   ic:'⭐',reward:10000, cond:()=>levelInfo(xp).level>=5, n:{uk:'5-й рівень',en:'Level 5',ru:'5-й уровень'}},
+ {id:'house',  ic:'🏠',reward:20000, cond:()=>ASSETS.some(a=>a.cat==='houses'&&owned[a.id]), n:{uk:'Власний дім',en:'Homeowner',ru:'Свой дом'}},
+ {id:'car',    ic:'🚗',reward:20000, cond:()=>ASSETS.some(a=>a.cat==='cars'&&owned[a.id]),   n:{uk:'Автовласник',en:'Car owner',ru:'Автовладелец'}},
+ {id:'vor',    ic:'🃏',reward:30000, cond:()=>seenSpecials.vor,      n:{uk:'Вибив «ВОР»',en:'Got “VOR”',ru:'Выбил «ВОР»'}},
+ {id:'rich',   ic:'🤑',reward:100000,cond:()=>totalEarned>=10000000, n:{uk:'Мультимільйонер',en:'Multimillionaire',ru:'Мультимиллионер'}}
+];
+function levelInfo(x){ let lvl=1, need=300, acc=0; while(x>=acc+need){ acc+=need; lvl++; need=300+(lvl-1)*200; }
+  return {level:lvl, cur:x-acc, need, pct:Math.min(100,Math.round((x-acc)/need*100))}; }
+function addXp(n){ const b=levelInfo(xp).level; xp+=n; save('xp',xp); if(levelInfo(xp).level>b) showToast(t('levelUp',{x:levelInfo(xp).level})); }
+function trackEarn(n){ totalEarned+=n; save('earned',totalEarned); }
+function checkAch(){ let ch=false;
+  for(const a of ACH){ if(!achDone[a.id] && a.cond()){ achDone[a.id]=true; ch=true;
+    if(a.reward) balance+=a.reward; showToast(t('achGot',{x:a.n[LANG]||a.n.uk})+(a.reward?(' +'+fmt(a.reward)+' ₴'):'')); } }
+  if(ch){ save('ach',achDone); save('balance',balance); updateTopbar(); if(activeScreen==='profile') renderProfile(); } }
+function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function canDaily(){ return dailyLast!==todayStr(); }
+function claimDaily(){ if(!canDaily()) return; dailyLast=todayStr(); save('daily',dailyLast);
+  balance+=300; freeSpins+=2; save('balance',balance); save('free',freeSpins); trackEarn(300); addXp(50);
+  updateTopbar(); updateSpinBtn(); renderProfile(); showToast(t('profile.dailyGot',{x:fmt(300)})); checkAch(); }
+function buyAsset(id){ const a=ASSETS.find(x=>x.id===id); if(!a||owned[a.id]) return;
+  if(balance<a.price){ showToast(t('shop.need',{x:fmt(a.price-balance)})); return; }
+  showConfirm(t('shop.buy')+': '+(a.n[LANG]||a.n.uk)+' — '+fmt(a.price)+' ₴?',()=>{
+    balance-=a.price; owned[a.id]=true; save('balance',balance); save('owned',owned);
+    if(a.cat==='bg') { equippedBg=a.id; save('bg',equippedBg); }
+    addXp(100); updateTopbar(); renderShop(); showToast(t('shop.bought',{x:a.n[LANG]||a.n.uk})); checkAch(); }); }
+function equipBg(id){ equippedBg=id; save('bg',equippedBg); renderShop(); if(activeScreen==='profile') renderProfile();
+  const a=ASSETS.find(x=>x.id===id); showToast(t('shop.equippedMsg',{x:a?(a.n[LANG]||a.n.uk):''})); }
+function setAvatar(e){ avatar=e; save('avatar',avatar); closeModal(); renderProfile(); }
+function pickAvatarModal(){ const m=document.getElementById('modal');
+  m.innerHTML='<div class="modal-card"><h3>'+t('profile.avatarPick')+'</h3><div class="avgrid">'+
+    AVATARS.map(e=>'<button class="avopt'+(e===avatar?' on':'')+'" onclick="setAvatar(\''+e+'\')">'+e+'</button>').join('')+
+    '</div><div class="modal-actions"><button class="btn ghost" onclick="closeModal()">'+t('cancel')+'</button></div></div>'; m.hidden=false; }
+function editNick(){ const m=document.getElementById('modal');
+  m.innerHTML='<div class="modal-card"><h3>'+t('profile.editNick')+'</h3><input id="nickIn" class="nickinput" maxlength="16" placeholder="'+t('profile.nickPh')+'" value="'+(nick||'')+'"><div class="modal-actions"><button class="btn ghost" onclick="closeModal()">'+t('cancel')+'</button><button class="btn gold" onclick="saveNick()">'+t('profile.save')+'</button></div></div>'; m.hidden=false;
+  setTimeout(()=>{ const i=document.getElementById('nickIn'); if(i) i.focus(); },60); }
+function saveNick(){ const i=document.getElementById('nickIn'); if(i){ nick=(i.value||'').trim().slice(0,16); save('nick',nick); } closeModal(); renderProfile(); }
+function renderProfile(){
+  const li=levelInfo(xp), rank=leaderRows('money').rank, bgObj=equippedBg&&ASSETS.find(a=>a.id===equippedBg);
+  const headBg=bgObj?bgObj.bg:'linear-gradient(135deg,#2c1019,#140810)', nm=nick||t('you');
+  const stat=(l,v)=>'<div class="stat"><div class="sv">'+v+'</div><div class="sl">'+l+'</div></div>';
+  const achN=ACH.filter(a=>achDone[a.id]).length, ownedList=ASSETS.filter(a=>owned[a.id]);
+  document.getElementById('profileBody').innerHTML=
+   '<div class="prof-head" style="background:'+headBg+'"><button class="avatar" onclick="pickAvatarModal()">'+avatar+'</button>'+
+    '<div class="pinfo"><div class="pnick">'+nm+' <button class="editbtn" onclick="editNick()">✏️</button></div>'+
+     '<div class="plvl">'+t('profile.level',{x:li.level})+'</div><div class="xpbar"><i style="width:'+li.pct+'%"></i></div>'+
+     '<div class="xptxt">'+li.cur+' / '+li.need+' XP</div></div></div>'+
+   '<div class="card"><div class="daily"><div><h3>'+t('profile.dailyTitle')+'</h3>'+
+     (canDaily()?'':'<p class="muted" style="margin:3px 0 0">'+t('profile.dailyWait')+'</p>')+'</div>'+
+     '<button class="btn gold" onclick="claimDaily()"'+(canDaily()?'':' disabled')+'>'+t('profile.dailyClaim')+'</button></div></div>'+
+   '<div class="stats">'+stat(t('profile.stSpins'),fmt(totalSpins))+stat(t('profile.stEarned'),fmt(totalEarned)+' ₴')+
+     stat(t('profile.stBest'),fmt(bestPrice)+' ₴')+stat(t('profile.stCol'),collection.length)+
+     stat(t('profile.stRank'),'#'+rank)+stat(t('profile.stAch'),achN+'/'+ACH.length)+'</div>'+
+   '<div class="scr-head"><h2>'+t('profile.achTitle')+'</h2></div><div class="achs">'+
+     ACH.map(a=>'<div class="ach'+(achDone[a.id]?' on':'')+'"><div class="ai">'+a.ic+'</div><div class="an">'+(a.n[LANG]||a.n.uk)+'</div></div>').join('')+'</div>'+
+   '<div class="scr-head"><h2>'+t('profile.owned')+'</h2></div>'+
+   (ownedList.length?'<div class="owned">'+ownedList.map(a=>'<div class="oitem"><div class="asset-thumb">'+assetThumbInner(a)+'</div><span class="oname">'+(a.n[LANG]||a.n.uk)+'</span></div>').join('')+'</div>':'<div class="empty">'+t('profile.noAssets')+'</div>');
+}
+function setShopTab(tab){ shopTab=tab; renderShop(); }
+function renderAssets(){
+  const cats=[['houses','shop.catHouses'],['cars','shop.catCars'],['bg','shop.catBg']];
+  return cats.map(c=>{ const cat=c[0];
+    return '<div class="scr-head" style="margin-top:4px"><h2 style="font-size:15px">'+t(c[1])+'</h2></div><div class="list">'+
+    ASSETS.filter(a=>a.cat===cat).map(a=>{ const own=owned[a.id], isBg=a.cat==='bg', eq=isBg&&equippedBg===a.id; let btn;
+      if(!own) btn='<button class="btn gold" onclick="buyAsset(\''+a.id+'\')">'+t('shop.buy')+'</button>';
+      else if(isBg) btn='<button class="btn '+(eq?'ghost':'blue')+'"'+(eq?' disabled':'')+' onclick="equipBg(\''+a.id+'\')">'+t(eq?'shop.equipped':'shop.equip')+'</button>';
+      else btn='<span class="ownedtag">'+t('shop.owned')+'</span>';
+      return '<div class="asset-card"><div class="asset-thumb">'+assetThumbInner(a)+'</div><div class="asset-info"><div class="asset-name">'+(a.n[LANG]||a.n.uk)+'</div><div class="asset-price">'+fmt(a.price)+' ₴</div></div>'+btn+'</div>';
+    }).join('')+'</div>'; }).join('');
+}
+
+/* ======================= Рендер ======================= */
+function fmt(n){ return Number(n).toLocaleString(LOCALE[LANG]); }
+function updateTopbar(){
+  document.getElementById('balance').textContent=fmt(balance);
+  const fc=document.getElementById('freeChip');
+  if(freeSpins>0){ fc.hidden=false; document.getElementById('freeVal').textContent=freeSpins; } else fc.hidden=true;
+  document.getElementById('langBtn').textContent=LANG_FLAG[LANG];
+  document.getElementById('muteBtn').textContent=muted?'🔇':'🔊';
+}
+function updateSpinBtn(){ const b=document.getElementById('spinBtn'); if(!b)return;
+  const sub=freeSpins>0?(t('free')+' ('+freeSpins+')'):('−'+SPIN_COST+' ₴');
+  b.innerHTML=t('spin')+'<span class="cost">'+sub+'</span>'; b.disabled=spinning; }
+function setVerdictHint(){ document.getElementById('verdict').innerHTML='<div class="hint">'+t('hintStart')+'</div>'; }
+function renderGameVerdict(){ if(spinning) return; if(current) document.getElementById('verdict').innerHTML=verdictResultHTML(false); else setVerdictHint(); }
+function renderNav(){
+  const items=[['game','🎰'],['collection','🗂'],['leaders','🏆'],['shop','🛒'],['profile','👤']];
+  document.getElementById('nav').innerHTML=items.map(([k,ic])=>
+    '<button class="navbtn'+(activeScreen===k?' on':'')+'" onclick="switchScreen(\''+k+'\')"><span class="ic">'+ic+'</span>'+t('nav.'+k)+'</button>').join('');
+}
+function switchScreen(name){ activeScreen=name;
+  document.querySelectorAll('.screen').forEach(s=>s.hidden = s.dataset.screen!==name);
+  renderNav(); renderScreen(name);
+}
+function renderScreen(name){
+  if(name==='game'){ updateSpinBtn(); renderGameVerdict();
+    document.getElementById('sellBtn').textContent=t('sell'); document.getElementById('keepBtn').textContent=t('keep'); }
+  else if(name==='collection') renderCollection();
+  else if(name==='leaders') renderLeaders();
+  else if(name==='shop') renderShop();
+  else if(name==='profile') renderProfile();
+}
+function renderCollection(){
+  document.getElementById('colTitle').textContent=t('colTitle');
+  document.getElementById('colCount').textContent=t('colCount',{x:collection.length});
+  document.getElementById('colTotalLbl').textContent=t('colTotal');
+  const sum=collection.reduce((a,b)=>a+b.price,0);
+  document.getElementById('colTotalAmt').textContent=fmt(sum)+' ₴';
+  const sa=document.getElementById('sellAllBtn');
+  if(collection.length){ sa.style.display='block'; sa.textContent=t('sellAll',{x:fmt(sum)}); } else sa.style.display='none';
+  const list=document.getElementById('colList');
+  if(!collection.length){ list.innerHTML='<div class="empty">'+t('colEmpty')+'</div>'; return; }
+  list.innerHTML=collection.map((c,i)=>
+    '<div class="row"><div class="meta"><div class="plate-mini">'+c.plate+'</div><div class="rk">'+t('ranks.'+(c.tier||0))+'</div></div>'+
+    '<div class="pr">'+fmt(c.price)+' ₴</div><button class="btn green" onclick="sellFromCollection('+i+')">'+t('sell')+'</button></div>').join('');
+}
+function setLeaderTab(tab){ leaderTab=tab;
+  document.getElementById('tabMoney').classList.toggle('on',tab==='money');
+  document.getElementById('tabSpins').classList.toggle('on',tab==='spins');
+  renderLeaders(); }
+function renderLeaders(){
+  document.getElementById('lbTitle').textContent=t('lbTitle');
+  document.getElementById('tabMoney').textContent=t('byMoney');
+  document.getElementById('tabSpins').textContent=t('bySpins');
+  const {top,rank,inTop,key}=leaderRows(leaderTab);
+  const medal=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+  const row=(e,i,realRank)=> '<div class="lb-row'+(e.me?' me':'')+(key==='spins'?' spins':'')+'">'+
+    '<div class="num">'+(realRank!=null?realRank:(i<3?'<span class="medal">'+medal(i)+'</span>':i+1))+'</div>'+
+    '<div class="nm">'+e.name+'</div><div class="val">'+fmt(e[key])+(key==='money'?' ₴':'')+'</div></div>';
+  let html=top.map((e,i)=>row(e,i)).join('');
+  if(!inTop){ const me={name:nick||t('you'),money:balance,spins:totalSpins,me:true}; html+='<div class="lb-sep"></div>'+row(me,null,rank); }
+  document.getElementById('lbList').innerHTML=html;
+}
+function renderShop(){
+  document.getElementById('shopTitle').textContent=t('shopTitle');
+  const tc=document.getElementById('shTabCur'), ta=document.getElementById('shTabAsset');
+  tc.textContent=t('shop.currency'); ta.textContent=t('shop.assets');
+  tc.classList.toggle('on',shopTab==='currency'); ta.classList.toggle('on',shopTab==='assets');
+  document.getElementById('shopCurrency').hidden=shopTab!=='currency';
+  document.getElementById('shopAssets').hidden=shopTab!=='assets';
+  if(shopTab==='assets'){ document.getElementById('shopAssets').innerHTML=renderAssets(); return; }
+  document.getElementById('freeTitle').textContent=t('freeTitle');
+  document.getElementById('freeDesc').textContent=t('freeDesc');
+  document.getElementById('watchAdBtn').textContent=t('watchAd');
+  document.getElementById('buyTitle').textContent=t('buyTitle');
+  document.getElementById('demoNote').textContent=t('demoNote');
+  const packs=[{c:10000,p:'$0.99',ic:'💰'},{c:60000,p:'$3.99',ic:'💰💰',tag:'popular'},{c:200000,p:'$9.99',ic:'💰💰💰',tag:'best'}];
+  document.getElementById('packList').innerHTML=packs.map(pk=>
+    '<div class="row pack"><div class="ic">'+pk.ic+'</div><div class="info"><div class="amt">'+fmt(pk.c)+' ₴</div>'+
+    (pk.tag?'<span class="tag'+(pk.tag==='best'?' best':'')+'">'+t(pk.tag)+'</span>':'')+'</div>'+
+    '<button class="btn gold" onclick="buyPack('+pk.c+')">'+pk.p+'</button></div>').join('');
+}
+
+/* ======================= Магазин дії ======================= */
+function watchAd(){
+  const m=document.getElementById('modal');
+  m.innerHTML='<div class="modal-card"><h3>'+t('adLoading')+'</h3><div class="adbar"><i id="adProg"></i></div></div>'; m.hidden=false;
+  const bar=document.getElementById('adProg'); let p=0;
+  const iv=setInterval(()=>{ p+=4; if(bar)bar.style.width=p+'%'; if(p>=100){ clearInterval(iv); closeModal();
+    freeSpins+=2; save('free',freeSpins); updateTopbar(); updateSpinBtn(); showToast(t('adDone')); } },90);
+}
+function buyPack(coins){ showConfirm(t('purchaseConfirm',{x:fmt(coins)}),()=>{ balance+=coins; save('balance',balance);
+  updateTopbar(); showToast(t('purchased',{x:fmt(coins)})); }); }
+
+/* ======================= Модалки / тост ======================= */
+let pendingOk=null;
+function showConfirm(msg,onOk){ pendingOk=onOk; const m=document.getElementById('modal');
+  m.innerHTML='<div class="modal-card"><p style="margin-top:4px">'+msg+'</p><div class="modal-actions">'+
+   '<button class="btn ghost" onclick="closeModal()">'+t('cancel')+'</button>'+
+   '<button class="btn gold" onclick="confirmModal()">'+t('ok')+'</button></div></div>'; m.hidden=false; }
+function confirmModal(){ const f=pendingOk; closeModal(); f&&f(); }
+function closeModal(){ const m=document.getElementById('modal'); m.hidden=true; m.innerHTML=''; pendingOk=null; }
+let toastT=null;
+function showToast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),2200); }
+
+/* ======================= Налаштування ======================= */
+function toggleMute(){ muted=!muted; save('muted',muted); updateTopbar(); if(!muted) ensureAudio(); }
+function cycleLang(){ LANG=LANGS[(LANGS.indexOf(LANG)+1)%LANGS.length]; save('lang',LANG); applyAll(); }
+function applyAll(){ document.documentElement.lang=LANG; updateTopbar(); renderNav(); renderScreen(activeScreen); }
+
+/* ======================= Утиліти/старт ======================= */
+function save(k,v){ try{localStorage.setItem('ns_'+k,JSON.stringify(v));}catch(e){} }
+function load(k,def){ try{const r=localStorage.getItem('ns_'+k); return r===null?def:JSON.parse(r);}catch(e){return def;} }
+updateTopbar(); renderNav(); switchScreen('game');
+</script>
